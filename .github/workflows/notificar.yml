@@ -1,0 +1,26 @@
+name: Notificar Calendário
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # Todo dia às 7h no Brasil
+  workflow_dispatch:      # Permite testar manualmente
+
+jobs:
+  enviar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Enviar e-mail se houver evento
+        run: |
+          HOJE=$(date +%m-%d)
+          MES=$(date +%m)
+          
+          # Só notifica a partir de Junho (mês 06)
+          if [ "$MES" -ge 06 ]; then
+            EVENTO=$(grep -o "\"$HOJE\": *\"[^\"]*\"" eventos.json | cut -d'"' -f4)
+            if [ -n "$EVENTO" ]; then
+              echo "📧 Evento encontrado: $EVENTO"
+              # Aqui entraria o envio de e-mail (veja Passo 3)
+            fi
+          fi
